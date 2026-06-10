@@ -36,8 +36,8 @@ Key Features
         ],
     },
     'images': [
-        'static/description/icon.png',
         'static/description/banner.gif',
+        'static/description/icon.png',
     ],
     'installable': True,
     'application': False,
