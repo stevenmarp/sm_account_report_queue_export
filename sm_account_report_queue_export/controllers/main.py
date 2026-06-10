@@ -16,7 +16,7 @@ class SmAccountReportQueueExportController(http.Controller):
         ):
             raise AccessError('Account Report Queue Export access denied.')
 
-    @http.route('/sm_account_report_queue_export/general_ledger/queue', type='json', auth='user')
+    @http.route('/sm_account_report_queue_export/general_ledger/queue', type='jsonrpc', auth='user')
     def general_ledger_queue(self, options=None, file_generator=None, **kwargs):
         if file_generator != 'export_to_xlsx':
             return {'queued': False}
@@ -51,7 +51,7 @@ class SmAccountReportQueueExportController(http.Controller):
             'action': action,
         }
 
-    @http.route('/sm_account_report_queue_export/general_ledger/status/<int:job_id>', type='json', auth='user')
+    @http.route('/sm_account_report_queue_export/general_ledger/status/<int:job_id>', type='jsonrpc', auth='user')
     def general_ledger_status(self, job_id, **kwargs):
         self._check_access()
         job = request.env['sm.account.report.queue.export'].browse(job_id).exists()
@@ -60,7 +60,7 @@ class SmAccountReportQueueExportController(http.Controller):
         job._mark_stale_if_needed()
         return self._job_payload(job, queued=True)
 
-    @http.route('/sm_account_report_queue_export/general_ledger/cancel/<int:job_id>', type='json', auth='user')
+    @http.route('/sm_account_report_queue_export/general_ledger/cancel/<int:job_id>', type='jsonrpc', auth='user')
     def general_ledger_cancel(self, job_id, **kwargs):
         self._check_access()
         job = request.env['sm.account.report.queue.export'].browse(job_id).exists()

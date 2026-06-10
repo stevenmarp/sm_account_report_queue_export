@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Account Report Queue Export | General Ledger XLSX Background Export',
-    'version': '18.0.1.0.0',
+    'version': '19.0.1.0.0',
     'category': 'Accounting/Accounting',
     'summary': 'Export large Odoo General Ledger reports in background without browser timeout',
     'description': """

@@ -397,11 +397,48 @@ class SmAccountReportQueueExport(models.Model):
         return self.env.cr.fetchone()[0]
 
     def _prepare_general_ledger_streaming_xlsx_file(self):
+        if self._is_odoo19_general_ledger_engine():
+            return self._prepare_general_ledger_native_xlsx_file()
         if not self.work_file_path or self.work_phase not in ('collect', 'finalize'):
             self._general_ledger_init_work_file()
         if self.work_phase == 'collect':
             return self._general_ledger_collect_work_chunk()
         return self._general_ledger_finalize_work_xlsx()
+
+    def _is_odoo19_general_ledger_engine(self):
+        handler = self.env['account.general.ledger.report.handler']
+        return not hasattr(handler, '_query_values') and hasattr(handler, '_report_custom_engine_general_ledger')
+
+    def _prepare_general_ledger_native_xlsx_file(self):
+        report, options = self._general_ledger_report_options()
+        filepath = self._new_export_filepath()
+        temp_path = '%s.part' % filepath
+        self.write({
+            'work_phase': 'finalize',
+            'progress': 50,
+            'message': _('Building General Ledger XLSX file...'),
+        })
+        self.env.cr.commit()
+        self._raise_if_cancelled()
+        result = report.with_context(sm_account_report_queue_export_skip_redirect=True).export_to_xlsx(options)
+        file_content = result.get('file_content')
+        if not file_content:
+            raise UserError(_('General Ledger XLSX exporter returned an empty file.'))
+        os.makedirs(os.path.dirname(filepath), exist_ok=True)
+        with open(temp_path, 'wb') as handle:
+            handle.write(file_content)
+        self._raise_if_cancelled()
+        os.replace(temp_path, filepath)
+        file_size = os.path.getsize(filepath)
+        if not file_size:
+            raise UserError(_('General Ledger XLSX exporter returned an empty file.'))
+        self.write({
+            'export_file_path': filepath,
+            'export_file_size': file_size,
+            'processed_count': self.row_count or self.processed_count,
+            'work_file_path': False,
+            'work_phase': False,
+        })
 
     def _general_ledger_init_work_file(self):
         work_path = '%s.jsonl' % self._new_export_filepath()
