@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_sm_account_report_queue_export"
+              name="Queue Exports"
+              parent="account.menu_finance_reports"
+              action="action_sm_account_report_queue_export"
+              groups="account.group_account_readonly"
+              sequence="90"/>
+</odoo>

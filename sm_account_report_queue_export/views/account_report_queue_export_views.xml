@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_sm_account_report_queue_export_list" model="ir.ui.view">
+        <field name="name">sm.account.report.queue.export.list</field>
+        <field name="model">sm.account.report.queue.export</field>
+        <field name="arch" type="xml">
+            <list string="Account Report Queue Exports">
+                <field name="name"/>
+                <field name="state"/>
+                <field name="runner_type"/>
+                <field name="progress" widget="progressbar"/>
+                <field name="processed_count"/>
+                <field name="row_count"/>
+                <field name="export_file_size_mb"/>
+                <field name="queued_at"/>
+                <field name="create_uid"/>
+                <field name="create_date"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_sm_account_report_queue_export_form" model="ir.ui.view">
+        <field name="name">sm.account.report.queue.export.form</field>
+        <field name="model">sm.account.report.queue.export</field>
+        <field name="arch" type="xml">
+            <form string="Account Report Queue Export">
+                <header>
+                    <button name="action_process_now" type="object" string="Process Now" class="btn-primary" invisible="state not in ('draft', 'queued', 'error')"/>
+                    <button name="action_cancel_export" type="object" string="Cancel Export" class="btn-secondary" invisible="state not in ('queued', 'running')"/>
+                    <button name="action_download_result" type="object" string="Download Result" class="btn-primary" invisible="state != 'done'"/>
+                    <button name="action_reset" type="object" string="Re-export" class="btn-secondary" invisible="state not in ('done', 'cancelled', 'error')"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,queued,running,cancelled,done,error"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="export_format" readonly="1"/>
+                            <field name="runner_type" readonly="1"/>
+                            <field name="priority" groups="sm_account_report_queue_export.group_account_report_queue_export_manager"/>
+                            <field name="max_retries" groups="sm_account_report_queue_export.group_account_report_queue_export_manager"/>
+                            <field name="retry_count" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="queued_at" readonly="1"/>
+                            <field name="started_at" readonly="1"/>
+                            <field name="finished_at" readonly="1"/>
+                            <field name="next_run_at" readonly="1"/>
+                            <field name="cancel_requested" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Progress" invisible="state == 'draft'">
+                        <div class="sm_account_report_queue_waiting" invisible="state != 'queued'" colspan="2">
+                            <i class="fa fa-spinner fa-spin" title="Loading"/>
+                            <span>Queue accepted. Waiting for background worker to start.</span>
+                        </div>
+                        <field name="progress" widget="progressbar"/>
+                        <field name="row_count" readonly="1"/>
+                        <field name="processed_count" readonly="1"/>
+                        <field name="export_file_size_mb" readonly="1"/>
+                        <field name="message" nolabel="1" readonly="1"/>
+                    </group>
+                    <group invisible="1">
+                        <field name="report_options_json"/>
+                        <field name="report_options_hash"/>
+                        <field name="export_file_path"/>
+                        <field name="work_file_path"/>
+                        <field name="work_phase"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_sm_account_report_queue_export" model="ir.actions.act_window">
+        <field name="name">Account Report Queue Exports</field>
+        <field name="res_model">sm.account.report.queue.export</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="view_sm_account_report_queue_export_list"/>
+    </record>
+</odoo>

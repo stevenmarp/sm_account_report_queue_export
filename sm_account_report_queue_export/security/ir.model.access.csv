@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_sm_account_report_queue_export_account_readonly,sm.account.report.queue.export.account.readonly,model_sm_account_report_queue_export,account.group_account_readonly,1,1,1,0
+access_sm_account_report_queue_export_user,sm.account.report.queue.export.user,model_sm_account_report_queue_export,sm_account_report_queue_export.group_account_report_queue_export_user,1,1,1,0
+access_sm_account_report_queue_export_manager,sm.account.report.queue.export.manager,model_sm_account_report_queue_export,sm_account_report_queue_export.group_account_report_queue_export_manager,1,1,1,1
